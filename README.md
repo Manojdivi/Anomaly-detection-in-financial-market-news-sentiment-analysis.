@@ -1,130 +1,13 @@
-pip install VaderSentiment
-import pandas as pd
-import numpy as np
-from textblob import TextBlob
-import re
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-df1 = pd.read_csv('dow_jones_news.csv')
-df2 = pd.read_csv('dow_jones_stock.csv')
-df1.head(5)
-df1.shape
-df2.head(5)
-df2.shape
-merge = df1.merge(df2, how='inner', left_index=True, right_index=True)
-merge
-merge.drop(columns=['Date_y'], inplace=True)
-merge
-headlines = []
+Knowing how news items' emotion affects them is essential for making wise decisions in the ever-changing world of financial markets. The importance of anomaly detection in financial market news sentiment research is clarified in this abstract, emphasizing its value in exposing underlying market 
+dynamics. 
 
-for row in range(0, len(merge.index)):
-  headlines.append(' '.join(str(x) for x in merge.iloc[row, 2:27]))
-clean_headlines = []
+A number of factors have a significant impact on financial markets, and sentiment is a key one. 
+The wide range of emotions expressed in news items, from optimism to pessimism, can have a big impact on market trends. But among all of this data, anomalies—differences from the norm or anticipated patterns—frequently surface. In order to understand the actual attitude of the market and predict future changes, analysts and investors must be able to identify these anomalies. 
 
-for i in range(0, len(headlines)):
-  clean_headlines.append(re.sub("b[(')]",'', headlines[i]))
-  clean_headlines[i] = re.sub('b[(")]', '', clean_headlines[i])
-  clean_headlines[i] = re.sub("\'", '', clean_headlines[i])
-clean_headlines[20]
-merge['combined_news'] = clean_headlines
+In order to find anomalies in the enormous corpus of sentiment data from financial news, anomaly detection techniques are essential. Anomaly detection models search through the noise using sophisticated machine learning algorithms to identify odd trends, attitudes, or occurrences that might portend future market moves. Investors may obtain important insights into market dynamics and successfully reduce risk by identifying anomalies, which will allow them to modify their strategy. 
 
-merge['combined_news'][0]
-merge.head(5)
-def getsubjectivity(text):
-  return TextBlob(text).sentiment.subjectivity
+In order to improve the precision and dependability of sentiment research in financial markets, anomaly identification is crucial, as this abstract highlights. Stakeholders can make better decisions and maximize returns by navigating the financial landscape's intricacies with more confidence when anomalies are routinely detected. 
 
-def getPolarity(text):
-  return TextBlob(text).sentiment.polarity
-merge['subjective'] = merge['combined_news'].apply(getsubjectivity)
-merge['Polarity'] = merge['combined_news'].apply(getPolarity)
-merge.head(5)
-def getSIA(text):
-  sia = SentimentIntensityAnalyzer()
-  sentiment = sia.polarity_scores(text)
-  return sentiment
-compound = []
-neg = []
-pos = []
-neu = []
-SIA = 0
+Ultimately, anomaly detection in financial market news sentiment analysis is a potent instrument for interpreting market dynamics and predicting changes in investor mood. Keeping ahead of the curve and making wise investment decisions will require incorporating anomaly detection techniques into sentiment research frameworks as financial markets continue to change.
 
-for i in range(0, len(merge['combined_news'])):
-  SIA = getSIA(merge['combined_news'][i])
-  compound.append(SIA['compound'])
-  neg.append(SIA['neg'])
-  neu.append(SIA['neu'])
-  pos.append(SIA['pos'])
-merge['compound'] = compound
-merge['negative'] = neg
-merge['neutral'] = neu
-merge['positive'] = pos
-merge.head(5)
-keep_columns = [ 'Open', 'High', 'Low', 'Volume', 'subjective', 'Polarity', 'compound', 'negative', 'neutral' ,'positive',  'Label' ]
-df = merge[keep_columns]
-df
-X = df
-X = np.array(X.drop(['Label'], 1))
-
-y = np.array(df['Label'])
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 32)
-model = LinearDiscriminantAnalysis().fit(x_train,y_train)
-pred = model.predict(x_test)
-pred
-y_test
-print(classification_report(y_test, pred))
-from flask import Flask, render_template, request
-from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from sklearn.model_selection import train_test_split
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.metrics import classification_report
-import numpy as np
-import pandas as pd
-
-app = Flask(__name__)
-
-def getSIA(text):
-    sia = SentimentIntensityAnalyzer()
-    sentiment = sia.polarity_scores(text)
-    return sentiment
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/analyze', methods=['POST'])
-def analyze():
-    if request.method == 'POST':
-        merge = pd.read_csv('path_to_your_csv_file.csv')  # Adjust the path to your CSV file
-        compound = []
-        neg = []
-        pos = []
-        neu = []
-        SIA = 0
-
-        for i in range(0, len(merge['combined_news'])):
-            SIA = getSIA(merge['combined_news'][i])
-            compound.append(SIA['compound'])
-            neg.append(SIA['neg'])
-            neu.append(SIA['neu'])
-            pos.append(SIA['pos'])
-
-        merge['compound'] = compounda
-        merge['negative'] = neg
-        merge['neutral'] = neu
-        merge['positive'] = pos
-
-        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=32)
-
-        model = LinearDiscriminantAnalysis().fit(x_train, y_train)
-
-        pred = model.predict(x_test)
-
-        classification_result = classification_report(y_test, pred)
-
-        return render_template('result.html', classification_result=classification_result)
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
